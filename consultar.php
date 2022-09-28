@@ -23,8 +23,7 @@
 <body>
 
 
-  <h3 style="text-align: center; font-size:30px;">
-  Resultados de la Encuesta Gaseosas</h3>
+  <h3 style="text-align: center; font-size:30px;">Resultados de la Encuesta</h3>
   <div>
     <div style="float:left;">
       <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -73,7 +72,7 @@
 
 
           var options = {
-            title: 'Estadistica de Encuesta de Gaseosas'
+            title: 'Estadistica de Encuesta'
           };
 
           var chart = new google.visualization.PieChart(document.getElementById('piechart'));
@@ -86,68 +85,64 @@
       
     </div>                
 
+    <?php
+      //variables de coneccion    
+      $servername="localhost";
+      $username="root";
+      $password="";
+      $dbname="bdencuesta1";
 
-           <?php
-                //variables de coneccion    
-                $servername="localhost";
-                $username="root";
-                $password="";
-                $dbname="bdencuesta1";
+      //crear coneccion
+      $conn=new mysqli($servername,$username,$password,$dbname);
 
-                //crear coneccion
-                $conn=new mysqli($servername,$username,$password,$dbname);
+      //check coneccion
 
-                //check coneccion
+      if ($conn->connect_error)
+      {
+        die("Coneccion fallada".$conn->connect_error);
+      }
 
-                if ($conn->connect_error){
-                    die("Coneccion fallada".$conn->connect_error);
+      $sql='SELECT sum(cantidad) total FROM tableencuesta';
+      $result=$conn->query($sql);
+      while ($row=$result->fetch_assoc())
+      {
+        $total = $row["total"];
+      }
 
-                }
+      //consulta
+        $querysql='SELECT id,opcion,cantidad FROM tableencuesta';
+        $result=$conn->query($querysql);
+      if($result->num_rows>0)
+      {
+        echo "<h1>Tabla de Resultado</h1>";
+        echo "<table border=1>";
+        echo "<tr> <td> id </td>  <td> Producto </td>    <td> Cantidad  </td> <td> Porcentaje  </td></tr>  ";
+      while ($row=$result->fetch_assoc())
+      {
+        $val = $row["cantidad"] * 100 / $total;
+        $Porc = round($val,2);
 
-                $sql='SELECT sum(cantidad) total FROM tableencuesta';
-                $result=$conn->query($sql);
-                while ($row=$result->fetch_assoc()){
-                  $total = $row["total"];
-                }
+        echo "<tr> <td>";
+        echo $row["id"]." </td> ";
+        echo "<td>".$row["opcion"]."</td>";
+        echo "<td align=center>".$row["cantidad"]."</td>";
+        echo "<td align=center>".$Porc." %</td> </tr>";
+      }
+      echo "</table>";
+      echo "</table>";
+      echo "<left><table border=1px>";
+      echo "<tr><td width=36px></td>";
+      echo "<td width=157px></td>";
+      echo "<td align=center>".$total."</td>";
+      echo "<td width=184px></td></tr>";
+      echo "</table>";
+      } else {
+        echo "0 resultados";
+      }
 
-
-                //consulta
-
-                $querysql='SELECT id,opcion,cantidad FROM tableencuesta';
-                $result=$conn->query($querysql);
-
-                if($result->num_rows>0)
-                {
-                    echo "<h1>Tabla de Resultado</h1>";
-                    echo "<table border=1>";
-                    echo "<tr> <td> id </td>  <td> Producto </td>    <td> Cantidad  </td> <td> Porcentaje  </td></tr>  ";
-                    while ($row=$result->fetch_assoc()){
-                      $val = $row["cantidad"] * 100 / $total;
-                      $Porc = round($val,2);
-
-                        echo "<tr> <td>";
-                        echo $row["id"]." </td> ";
-                        echo "<td>".$row["opcion"]."</td>";
-                        echo "<td align=center>".$row["cantidad"]."</td>";
-                        echo "<td align=center>".$Porc." %</td> </tr>";
-                    }
-                    echo "</table>";
-                    echo "</table>";
-                    echo "<left><table border=1px>";
-                    echo "<tr><td width=36px></td>";
-                    echo "<td width=157px></td>";
-                    echo "<td align=center>".$total."</td>";
-                    echo "<td width=184px></td></tr>";
-                    echo "</table>";
-                } else {
-                        echo "0 resultados";
-                }
-
-                //cerrar coneccion
-
-                $conn->close();
-                
-                ?>
+      //cerrar coneccion
+       $conn->close();               
+    ?>
   </div>
 </body>
 </html>
